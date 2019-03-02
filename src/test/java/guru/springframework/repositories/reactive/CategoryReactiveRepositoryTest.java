@@ -7,9 +7,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Flux;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -29,18 +29,13 @@ public class CategoryReactiveRepositoryTest
     public void save() throws Exception
     {
         Category category = new Category();
-        category.setId("1");
+        category.setDescription("Foo");
 
-        Category category2 = new Category();
-        category.setId("2");
+        categoryReactiveRepository.save(category).block();
 
-        Flux<Category> categoryFlux = Flux.just(category, category2);
+        Long count = categoryReactiveRepository.count().block();
 
-        categoryReactiveRepository.saveAll(categoryFlux).blockFirst();
-
-        final Long count = categoryReactiveRepository.count().block();
-
-        assertEquals(Long.valueOf(2L), count);
+        assertEquals(Long.valueOf(1L), count);
 
     }
 
