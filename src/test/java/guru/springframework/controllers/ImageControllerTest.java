@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -18,7 +19,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class ImageControllerTest {
+public class ImageControllerTest
+{
 
     @Mock
     ImageService imageService;
@@ -31,7 +33,8 @@ public class ImageControllerTest {
     MockMvc mockMvc;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         MockitoAnnotations.initMocks(this);
 
         controller = new ImageController(imageService, recipeService);
@@ -41,12 +44,13 @@ public class ImageControllerTest {
     }
 
     @Test
-    public void getImageForm() throws Exception {
+    public void getImageForm() throws Exception
+    {
         //given
         RecipeCommand command = new RecipeCommand();
         command.setId("1");
 
-        when(recipeService.findCommandById(anyString())).thenReturn(command);
+        when(recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         //when
         mockMvc.perform(get("/recipe/1/image"))
@@ -58,7 +62,8 @@ public class ImageControllerTest {
     }
 
     @Test
-    public void handleImagePost() throws Exception {
+    public void handleImagePost() throws Exception
+    {
         MockMultipartFile multipartFile =
                 new MockMultipartFile("imagefile", "testing.txt", "text/plain",
                         "Spring Framework Guru".getBytes());
@@ -72,7 +77,8 @@ public class ImageControllerTest {
 
 
     @Test
-    public void renderImageFromDB() throws Exception {
+    public void renderImageFromDB() throws Exception
+    {
 
         //given
         RecipeCommand command = new RecipeCommand();
@@ -83,13 +89,14 @@ public class ImageControllerTest {
 
         int i = 0;
 
-        for (byte primByte : s.getBytes()){
+        for (byte primByte : s.getBytes())
+        {
             bytesBoxed[i++] = primByte;
         }
 
         command.setImage(bytesBoxed);
 
-        when(recipeService.findCommandById(anyString())).thenReturn(command);
+        when(recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         //when
         MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
